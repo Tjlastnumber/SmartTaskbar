@@ -17,11 +17,12 @@ namespace SmartTask
 {
     public partial class MainForm : Form
     {
-        private bool currentWindowMax = false;
+        private bool currentWindowState = false;
 
         private StringBuilder currentWindowClassName = new StringBuilder(256);
 
         private int cacheProcessId;
+        private IntPtr cacheIntPtr;
 
         [DllImport("user32.dll")]
         public static extern bool IsZoomed(IntPtr hWnd);
@@ -52,15 +53,19 @@ namespace SmartTask
                     if (hWnd != IntPtr.Zero)
                     {
                         GetClassName(hWnd, currentWindowClassName, currentWindowClassName.Capacity);
-                        if (currentWindowClassName.ToString() != "Windows.UI.Core.CoreWindow" &&
-                            calcID != cacheProcessId)
+                        if (currentWindowClassName.ToString() != "Windows.UI.Core.CoreWindow")
                         {
-                            cacheProcessId = calcID;
                             bool isZoomed = IsZoomed(hWnd);
-                            if (currentWindowMax != isZoomed)
+                            if (currentWindowState != isZoomed)
                             {
-                                SwichTaskBar(IsZoomed(hWnd));
-                                currentWindowMax = isZoomed;
+                                // 相同进程的子窗体不会切换任务栏显示
+                                if (cacheProcessId != calcID || cacheIntPtr == hWnd)
+                                {
+                                    SwichTaskBar(IsZoomed(hWnd));
+                                    currentWindowState = isZoomed;
+                                    cacheProcessId = calcID;
+                                    cacheIntPtr = hWnd;
+                                }
                             }
                         }
                     }
