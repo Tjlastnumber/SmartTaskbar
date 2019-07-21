@@ -33,8 +33,8 @@
             this.taskbarIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.contextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.RunStart = new System.Windows.Forms.ToolStripMenuItem();
-            this.Quit = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.Quit = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -56,12 +56,16 @@
             // 
             // RunStart
             // 
-            this.RunStart.Checked = true;
-            this.RunStart.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.RunStart.CheckOnClick = true;
             this.RunStart.Name = "RunStart";
             this.RunStart.Size = new System.Drawing.Size(180, 22);
             this.RunStart.Text = "开机启动";
             this.RunStart.CheckedChanged += new System.EventHandler(this.RunStart_CheckedChanged);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
             // 
             // Quit
             // 
@@ -69,11 +73,6 @@
             this.Quit.Size = new System.Drawing.Size(180, 22);
             this.Quit.Text = "退出";
             this.Quit.Click += new System.EventHandler(this.Quit_Click);
-            // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
             // 
             // MainForm
             // 
