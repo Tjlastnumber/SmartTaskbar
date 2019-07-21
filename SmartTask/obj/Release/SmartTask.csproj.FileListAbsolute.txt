@@ -1,0 +1,12 @@
+E:\project\SmartTask\SmartTask\obj\Release\SmartTask.csprojAssemblyReference.cache
+E:\project\SmartTask\SmartTask\obj\Release\SmartTask.MainForm.resources
+E:\project\SmartTask\SmartTask\obj\Release\SmartTask.Properties.Resources.resources
+E:\project\SmartTask\SmartTask\obj\Release\SmartTask.csproj.GenerateResource.cache
+E:\project\SmartTask\SmartTask\obj\Release\SmartTask.csproj.CoreCompileInputs.cache
+E:\project\SmartTask\SmartTask\bin\Release\SmartTask.exe.config
+E:\project\SmartTask\SmartTask\bin\Release\SmartTask.exe
+E:\project\SmartTask\SmartTask\bin\Release\SmartTask.pdb
+E:\project\SmartTask\SmartTask\bin\Release\Win32ApI.dll
+E:\project\SmartTask\SmartTask\obj\Release\SmartTask.csproj.CopyComplete
+E:\project\SmartTask\SmartTask\obj\Release\SmartTask.exe
+E:\project\SmartTask\SmartTask\obj\Release\SmartTask.pdb
