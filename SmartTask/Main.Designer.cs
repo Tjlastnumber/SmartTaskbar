@@ -33,8 +33,8 @@
             this.taskbarIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.contextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.RunStart = new System.Windows.Forms.ToolStripMenuItem();
-            this.Quit = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.Quit = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -52,34 +52,34 @@
             this.toolStripSeparator1,
             this.Quit});
             this.contextMenuStrip.Name = "contextMenuStrip1";
-            this.contextMenuStrip.Size = new System.Drawing.Size(181, 76);
+            this.contextMenuStrip.Size = new System.Drawing.Size(125, 54);
             // 
             // RunStart
             // 
             this.RunStart.Checked = true;
             this.RunStart.CheckState = System.Windows.Forms.CheckState.Checked;
             this.RunStart.Name = "RunStart";
-            this.RunStart.Size = new System.Drawing.Size(180, 22);
+            this.RunStart.Size = new System.Drawing.Size(124, 22);
             this.RunStart.Text = "开机启动";
             this.RunStart.CheckedChanged += new System.EventHandler(this.RunStart_CheckedChanged);
-            // 
-            // Quit
-            // 
-            this.Quit.Name = "Quit";
-            this.Quit.Size = new System.Drawing.Size(180, 22);
-            this.Quit.Text = "退出";
-            this.Quit.Click += new System.EventHandler(this.Quit_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(121, 6);
+            // 
+            // Quit
+            // 
+            this.Quit.Name = "Quit";
+            this.Quit.Size = new System.Drawing.Size(124, 22);
+            this.Quit.Text = "退出";
+            this.Quit.Click += new System.EventHandler(this.Quit_Click);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(313, 251);
+            this.ClientSize = new System.Drawing.Size(199, 46);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;

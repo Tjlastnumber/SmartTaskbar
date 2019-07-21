@@ -22,6 +22,9 @@ namespace SmartTask
         [DllImport("user32.dll")]
         public static extern bool IsZoomed(IntPtr hWnd);
 
+        [DllImport("user32.dll")]
+        private static extern int GetClassName(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
+
         public MainForm()
         {
             InitializeComponent();
@@ -32,6 +35,8 @@ namespace SmartTask
             base.OnShown(e);
             Hide();
         }
+
+        private StringBuilder currentActiveClassName = new StringBuilder(256);
 
         protected override void OnLoad(EventArgs e)
         {
@@ -44,23 +49,28 @@ namespace SmartTask
                     IntPtr hWnd = User32.GetForegroundWindowProcessId(out int calcID);
                     if (hWnd != IntPtr.Zero)
                     {
-                        bool isZoomed = IsZoomed(hWnd);
-                        if (currentWindowMax != isZoomed)
+                        GetClassName(hWnd, currentActiveClassName, currentActiveClassName.Capacity);
+                        // 排除因任务栏切换造成不能查看任务视图
+                        if (currentActiveClassName.ToString() != "Windows.UI.Core.CoreWindow")
                         {
-                            SwichTaskBar(IsZoomed(hWnd));
-                            currentWindowMax = isZoomed;
+                            bool isZoomed = IsZoomed(hWnd);
+                            if (currentWindowMax != isZoomed)
+                            {
+                                SwichTaskBar(IsZoomed(hWnd));
+                                currentWindowMax = isZoomed;
+                            }
                         }
                     }
                     Thread.Sleep(500);
                 }
             });
-
         }
 
         private void SwichTaskBar(bool isHide)
         {
-            TaskbarController.SetTaskbarState(isHide ? 
-                TaskbarController.AppBarStates.AutoHide : 
+            TaskbarController.SetTaskbarState(
+                isHide ?
+                TaskbarController.AppBarStates.AutoHide :
                 TaskbarController.AppBarStates.AlwaysOnTop);
         }
 
