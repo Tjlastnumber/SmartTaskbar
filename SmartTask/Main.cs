@@ -19,8 +19,13 @@ namespace SmartTask
     {
         private bool currentWindowMax = false;
 
+        private StringBuilder currentWindowClassName = new StringBuilder(256);
+
         [DllImport("user32.dll")]
         public static extern bool IsZoomed(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        private static extern int GetClassName(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
 
         public MainForm()
         {
@@ -44,11 +49,15 @@ namespace SmartTask
                     IntPtr hWnd = User32.GetForegroundWindowProcessId(out int calcID);
                     if (hWnd != IntPtr.Zero)
                     {
-                        bool isZoomed = IsZoomed(hWnd);
-                        if (currentWindowMax != isZoomed)
+                        GetClassName(hWnd, currentWindowClassName, currentWindowClassName.Capacity);
+                        if (currentWindowClassName.ToString() != "Windows.UI.Core.CoreWindow")
                         {
-                            SwichTaskBar(IsZoomed(hWnd));
-                            currentWindowMax = isZoomed;
+                            bool isZoomed = IsZoomed(hWnd);
+                            if (currentWindowMax != isZoomed)
+                            {
+                                SwichTaskBar(IsZoomed(hWnd));
+                                currentWindowMax = isZoomed;
+                            }
                         }
                     }
                     Thread.Sleep(500);
@@ -59,8 +68,8 @@ namespace SmartTask
 
         private void SwichTaskBar(bool isHide)
         {
-            TaskbarController.SetTaskbarState(isHide ? 
-                TaskbarController.AppBarStates.AutoHide : 
+            TaskbarController.SetTaskbarState(isHide ?
+                TaskbarController.AppBarStates.AutoHide :
                 TaskbarController.AppBarStates.AlwaysOnTop);
         }
 
