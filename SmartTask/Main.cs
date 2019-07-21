@@ -21,6 +21,8 @@ namespace SmartTask
 
         private StringBuilder currentWindowClassName = new StringBuilder(256);
 
+        private int cacheProcessId;
+
         [DllImport("user32.dll")]
         public static extern bool IsZoomed(IntPtr hWnd);
 
@@ -50,8 +52,10 @@ namespace SmartTask
                     if (hWnd != IntPtr.Zero)
                     {
                         GetClassName(hWnd, currentWindowClassName, currentWindowClassName.Capacity);
-                        if (currentWindowClassName.ToString() != "Windows.UI.Core.CoreWindow")
+                        if (currentWindowClassName.ToString() != "Windows.UI.Core.CoreWindow" &&
+                            calcID != cacheProcessId)
                         {
+                            cacheProcessId = calcID;
                             bool isZoomed = IsZoomed(hWnd);
                             if (currentWindowMax != isZoomed)
                             {
