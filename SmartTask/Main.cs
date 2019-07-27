@@ -55,7 +55,9 @@ namespace SmartTask
                         GetClassName(hWnd, currentWindowClassName, currentWindowClassName.Capacity);
                         if (currentWindowClassName.ToString() != "Windows.UI.Core.CoreWindow" && 
                             currentWindowClassName.ToString() != "MultitaskingViewFrame" &&
-                            currentWindowClassName.ToString() != "ForegroundStaging")
+                            currentWindowClassName.ToString() != "ForegroundStaging" && 
+                            currentWindowClassName.ToString() != "Shell_TrayWnd" &&
+                            currentWindowClassName.ToString() != "Shell_SencondaryTrayWnd")
                         {
                             Console.Out.WriteLine(currentWindowClassName.ToString());
                             bool isZoomed = IsZoomed(hWnd);
