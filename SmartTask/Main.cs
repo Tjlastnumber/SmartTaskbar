@@ -1,11 +1,6 @@
 ﻿using SmartTask.Properties;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
@@ -18,6 +13,7 @@ namespace SmartTask
     public partial class MainForm : Form
     {
         private bool currentWindowState = false;
+        private bool preWindowState = false;    
 
         private StringBuilder currentWindowClassName = new StringBuilder(256);
 
@@ -30,9 +26,16 @@ namespace SmartTask
         [DllImport("user32.dll")]
         private static extern int GetClassName(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
 
+        private readonly List<string> _ignoreWindowName = new List<string>();
+
         public MainForm()
         {
             InitializeComponent();
+            _ignoreWindowName.Add("Windows.UI.Core.CoreWindow");
+            _ignoreWindowName.Add("MultitaskingViewFrame");
+            _ignoreWindowName.Add("ForegroundStaging");
+            _ignoreWindowName.Add("Shell_TrayWnd");
+            _ignoreWindowName.Add("Shell_SencondaryTrayWnd");
         }
 
         protected override void OnShown(EventArgs e)
@@ -44,30 +47,36 @@ namespace SmartTask
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
-
             Task.Factory.StartNew(() =>
             {
                 for (; ; )
                 {
                     IntPtr hWnd = User32.GetForegroundWindowProcessId(out int calcID);
+                    currentWindowState = IsZoomed(hWnd);
+                    Thread.Sleep(300);
+                }
+            });
+
+
+            Task.Factory.StartNew(() =>
+            {
+                for (; ; )
+                {
+                    if (preWindowState != currentWindowState) Thread.Sleep(3 * 1000);
+                    IntPtr hWnd = User32.GetForegroundWindowProcessId(out int calcID);
                     if (hWnd != IntPtr.Zero)
                     {
                         GetClassName(hWnd, currentWindowClassName, currentWindowClassName.Capacity);
-                        if (currentWindowClassName.ToString() != "Windows.UI.Core.CoreWindow" && 
-                            currentWindowClassName.ToString() != "MultitaskingViewFrame" &&
-                            currentWindowClassName.ToString() != "ForegroundStaging" && 
-                            currentWindowClassName.ToString() != "Shell_TrayWnd" &&
-                            currentWindowClassName.ToString() != "Shell_SencondaryTrayWnd")
+                        if (!_ignoreWindowName.Contains(currentWindowClassName.ToString()))
                         {
-                            Console.Out.WriteLine(currentWindowClassName.ToString());
-                            bool isZoomed = IsZoomed(hWnd);
-                            if (currentWindowState != isZoomed)
+                            //bool isZoomed = IsZoomed(hWnd);
+                            if (preWindowState != currentWindowState)
                             {
                                 // 相同进程的子窗体不会切换任务栏显示
                                 if (cacheProcessId != calcID || cacheIntPtr == hWnd)
                                 {
-                                    SwichTaskBar(IsZoomed(hWnd));
-                                    currentWindowState = isZoomed;
+                                    preWindowState = currentWindowState;
+                                    SwichTaskBar(currentWindowState);
                                     cacheProcessId = calcID;
                                     cacheIntPtr = hWnd;
                                 }
