@@ -1,6 +1,6 @@
 ﻿using SmartTask.Properties;
 using System;
-using System.Diagnostics;
+using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -16,22 +16,21 @@ namespace SmartTask
         private const int WH_KEYBOARD_LL = 13;
         private const int WH_MOUSE_LL = 14;
 
-        private readonly StringBuilder currentWindowClassName = new StringBuilder(256);
+        private readonly StringBuilder _currentWindowClassName = new StringBuilder(256);
         private readonly string _ignoreWindowName = string.Empty;
 
-        private bool currentWindowState = false;
-        private bool preWindowState = false;
-
-        private int cacheProcessId;
-        private IntPtr cacheIntPtr;
+        //定义钩子句柄
+        public static int _hHook = 0;
+        private static bool _isShow = false;
+        private static System.Timers.Timer _timer;
 
         private static HookProc MouseHookProc;
         private static HookProc KeyBoardHookProc;
-        //定义钩子句柄
-        public static int hHook = 0;
-        public static bool operating = false;
-        private static bool isShow = false;
 
+        private bool preWindowState;
+        private bool currentWindowState;
+        private int cacheProcessId;
+        private IntPtr cacheIntPtr;
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
         private static extern int SetWindowsHookEx(int idHook, HookProc lpfn, IntPtr intPtr, int dwThreadId);
@@ -45,8 +44,6 @@ namespace SmartTask
         [DllImport("user32.dll")]
         private static extern int GetClassName(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
 
-        System.Timers.Timer _timer;
-
         public MainForm()
         {
             InitializeComponent();
@@ -55,13 +52,13 @@ namespace SmartTask
             MouseHookProc = new HookProc(MouseHookHandler);
             KeyBoardHookProc = new HookProc(KeyBoardHookHandler);
 
-            hHook = SetWindowsHookEx(
+            _hHook = SetWindowsHookEx(
                    WH_MOUSE_LL,
                    MouseHookProc,
                    Marshal.GetHINSTANCE(Assembly.GetExecutingAssembly().GetModules()[0]),
                    0);
 
-            hHook = SetWindowsHookEx(
+            _hHook = SetWindowsHookEx(
                    WH_KEYBOARD_LL,
                    KeyBoardHookProc,
                    Marshal.GetHINSTANCE(Assembly.GetExecutingAssembly().GetModules()[0]),
@@ -85,23 +82,29 @@ namespace SmartTask
             _timer.Start();
         }
 
+        private void ResetTimer()
+        {
+            _timer.Close();
+            InitTimer();
+        }
+
         private int MouseHookHandler(int nCode, int wParam, IntPtr lParam)
         {
-            operating = true;
-            return CallNextHookEx(hHook, nCode, wParam, lParam);
+            ResetTimer();
+            return CallNextHookEx(_hHook, nCode, wParam, lParam);
         }
 
         private int KeyBoardHookHandler(int nCode, int wParam, IntPtr lParam)
         {
-            operating = true;
-            return CallNextHookEx(hHook, nCode, wParam, lParam);
+            ResetTimer();
+            return CallNextHookEx(_hHook, nCode, wParam, lParam);
         }
 
         protected override void OnShown(EventArgs e)
         {
             base.OnShown(e);
             Hide();
-            isShow = false;
+            _isShow = false;
         }
 
         protected override void OnLoad(EventArgs e)
@@ -115,8 +118,8 @@ namespace SmartTask
 
                     if (hWnd != IntPtr.Zero)
                     {
-                        GetClassName(hWnd, currentWindowClassName, currentWindowClassName.Capacity);
-                        if (!_ignoreWindowName.Contains(currentWindowClassName.ToString()))
+                        GetClassName(hWnd, _currentWindowClassName, _currentWindowClassName.Capacity);
+                        if (!_ignoreWindowName.Contains(_currentWindowClassName.ToString()))
                         {
                             //bool isZoomed = IsZoomed(hWnd);
                             if (preWindowState != currentWindowState)
@@ -140,15 +143,28 @@ namespace SmartTask
 
         private void Time_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            if (operating)
+            IntPtr hWnd = User32.GetForegroundWindowProcessId(out int calcID);
+
+            if (hWnd != IntPtr.Zero)
             {
-                operating = false;
-                return;
-            }
-            else
-            {
-                IntPtr hWnd = User32.GetForegroundWindowProcessId(out int calcID);
-                currentWindowState = IsZoomed(hWnd);
+                GetClassName(hWnd, _currentWindowClassName, _currentWindowClassName.Capacity);
+                if (!_ignoreWindowName.Contains(_currentWindowClassName.ToString()))
+                {
+                    currentWindowState = IsZoomed(hWnd);
+                    Console.WriteLine("currentWindowState: " + currentWindowState);
+                    Console.WriteLine("preWindowState: " + preWindowState);
+                    if (preWindowState == null || preWindowState != currentWindowState)
+                    {
+                        // 相同进程的子窗体不会切换任务栏显示
+                        if (cacheProcessId != calcID || cacheIntPtr == hWnd)
+                        {
+                            preWindowState = currentWindowState;
+                            SwichTaskBar(currentWindowState);
+                            cacheProcessId = calcID;
+                            cacheIntPtr = hWnd;
+                        }
+                    }
+                }
             }
         }
 
@@ -175,15 +191,15 @@ namespace SmartTask
 
         private void taskbarIcon_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            if (isShow)
+            if (_isShow)
             {
                 Hide();
-            } 
+            }
             else
             {
                 Show();
             }
-            isShow = !isShow;
+            _isShow = !_isShow;
         }
 
         private void btnOK_Click(object sender, EventArgs e)
@@ -191,6 +207,7 @@ namespace SmartTask
             _timer.Stop();
             _timer.Interval = Convert.ToDouble(this.interval.Value) * 1000;
             _timer.Start();
+            Hide();
         }
 
         private void Quit_Click(object sender, EventArgs e)
@@ -198,8 +215,9 @@ namespace SmartTask
             Application.Exit();
         }
 
-        protected override void OnClosed(EventArgs e)
+        protected override void OnClosing(CancelEventArgs e)
         {
+            e.Cancel = true;
             Hide();
         }
 
