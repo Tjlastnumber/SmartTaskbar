@@ -1,5 +1,6 @@
 ﻿using SmartTask.Properties;
 using System;
+using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -29,6 +30,7 @@ namespace SmartTask
         //定义钩子句柄
         public static int hHook = 0;
         public static bool operating = false;
+        private static bool isShow = false;
 
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
@@ -42,6 +44,8 @@ namespace SmartTask
 
         [DllImport("user32.dll")]
         private static extern int GetClassName(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
+
+        System.Timers.Timer _timer;
 
         public MainForm()
         {
@@ -68,6 +72,17 @@ namespace SmartTask
                 "ForegroundStaging, " +
                 "Shell_TrayWnd, " +
                 "Shell_SencondaryTrayWnd";
+
+            InitTimer();
+        }
+
+        private void InitTimer()
+        {
+            var inter = Convert.ToDouble(this.interval.Value) * 1000D;
+            _timer = new System.Timers.Timer(inter);
+            _timer.Elapsed += Time_Elapsed;
+            _timer.AutoReset = true;
+            _timer.Start();
         }
 
         private int MouseHookHandler(int nCode, int wParam, IntPtr lParam)
@@ -86,6 +101,7 @@ namespace SmartTask
         {
             base.OnShown(e);
             Hide();
+            isShow = false;
         }
 
         protected override void OnLoad(EventArgs e)
@@ -96,20 +112,6 @@ namespace SmartTask
                 for (; ; )
                 {
                     IntPtr hWnd = User32.GetForegroundWindowProcessId(out int calcID);
-                    currentWindowState = IsZoomed(hWnd);
-                    Thread.Sleep(1000);
-                    if (operating) operating = false;
-                }
-            });
-
-
-            Task.Factory.StartNew(() =>
-            {
-                for (; ; )
-                {
-                    if (preWindowState != currentWindowState) Thread.Sleep(3 * 1000);
-
-                    IntPtr hWnd = User32.GetForegroundWindowProcessId(out int calcID);
 
                     if (hWnd != IntPtr.Zero)
                     {
@@ -117,7 +119,7 @@ namespace SmartTask
                         if (!_ignoreWindowName.Contains(currentWindowClassName.ToString()))
                         {
                             //bool isZoomed = IsZoomed(hWnd);
-                            if (preWindowState != currentWindowState && !operating)
+                            if (preWindowState != currentWindowState)
                             {
                                 // 相同进程的子窗体不会切换任务栏显示
                                 if (cacheProcessId != calcID || cacheIntPtr == hWnd)
@@ -134,6 +136,20 @@ namespace SmartTask
                 }
             });
 
+        }
+
+        private void Time_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            if (operating)
+            {
+                operating = false;
+                return;
+            }
+            else
+            {
+                IntPtr hWnd = User32.GetForegroundWindowProcessId(out int calcID);
+                currentWindowState = IsZoomed(hWnd);
+            }
         }
 
         private void SwichTaskBar(bool isHide)
@@ -157,18 +173,38 @@ namespace SmartTask
             }
         }
 
+        private void taskbarIcon_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            if (isShow)
+            {
+                Hide();
+            } 
+            else
+            {
+                Show();
+            }
+            isShow = !isShow;
+        }
+
+        private void btnOK_Click(object sender, EventArgs e)
+        {
+            _timer.Stop();
+            _timer.Interval = Convert.ToDouble(this.interval.Value) * 1000;
+            _timer.Start();
+        }
+
         private void Quit_Click(object sender, EventArgs e)
         {
-            Close();
+            Application.Exit();
         }
 
         protected override void OnClosed(EventArgs e)
         {
-            base.OnClosed(e);
-            Application.Exit();
+            Hide();
         }
 
         private delegate int HookProc(int nCode, int wParam, IntPtr IParam);
+
     }
 
 }
