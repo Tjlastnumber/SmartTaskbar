@@ -27,7 +27,7 @@ namespace SmartTask
         private static HookProc MouseHookProc;
         private static HookProc KeyBoardHookProc;
 
-        private bool preWindowState;
+        private bool? preWindowState;
         private bool currentWindowState;
         private int cacheProcessId;
         private IntPtr cacheIntPtr;
@@ -110,35 +110,6 @@ namespace SmartTask
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
-            Task.Factory.StartNew(() =>
-            {
-                for (; ; )
-                {
-                    IntPtr hWnd = User32.GetForegroundWindowProcessId(out int calcID);
-
-                    if (hWnd != IntPtr.Zero)
-                    {
-                        GetClassName(hWnd, _currentWindowClassName, _currentWindowClassName.Capacity);
-                        if (!_ignoreWindowName.Contains(_currentWindowClassName.ToString()))
-                        {
-                            //bool isZoomed = IsZoomed(hWnd);
-                            if (preWindowState != currentWindowState)
-                            {
-                                // 相同进程的子窗体不会切换任务栏显示
-                                if (cacheProcessId != calcID || cacheIntPtr == hWnd)
-                                {
-                                    preWindowState = currentWindowState;
-                                    SwichTaskBar(currentWindowState);
-                                    cacheProcessId = calcID;
-                                    cacheIntPtr = hWnd;
-                                }
-                            }
-                        }
-                    }
-                    Thread.Sleep(500);
-                }
-            });
-
         }
 
         private void Time_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
@@ -151,8 +122,6 @@ namespace SmartTask
                 if (!_ignoreWindowName.Contains(_currentWindowClassName.ToString()))
                 {
                     currentWindowState = IsZoomed(hWnd);
-                    Console.WriteLine("currentWindowState: " + currentWindowState);
-                    Console.WriteLine("preWindowState: " + preWindowState);
                     if (preWindowState == null || preWindowState != currentWindowState)
                     {
                         // 相同进程的子窗体不会切换任务栏显示
