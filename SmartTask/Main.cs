@@ -70,12 +70,14 @@ namespace SmartTask
                 "Shell_TrayWnd, " +
                 "Shell_SencondaryTrayWnd";
 
+            this.Nud_Interval.Value = Settings.Default.Interval;
+
             InitTimer();
         }
 
         private void InitTimer()
         {
-            var inter = Convert.ToDouble(this.interval.Value) * 1000D;
+            var inter = Convert.ToDouble(this.Nud_Interval.Value) * 1000D;
             _timer = new System.Timers.Timer(inter);
             _timer.Elapsed += Time_Elapsed;
             _timer.AutoReset = true;
@@ -158,6 +160,17 @@ namespace SmartTask
             }
         }
 
+        private void BtnOK_Click(object sender, EventArgs e)
+        {
+            Settings.Default.Interval = this.Nud_Interval.Value;
+            var interval = Convert.ToDouble(this.Nud_Interval.Value) * 1000D;
+            _timer.Stop();
+            _timer.Interval = interval;
+            _timer.Start();
+
+            Hide();
+        }
+
         private void taskbarIcon_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             if (_isShow)
@@ -171,14 +184,6 @@ namespace SmartTask
             _isShow = !_isShow;
         }
 
-        private void btnOK_Click(object sender, EventArgs e)
-        {
-            _timer.Stop();
-            _timer.Interval = Convert.ToDouble(this.interval.Value) * 1000;
-            _timer.Start();
-            Hide();
-        }
-
         private void Quit_Click(object sender, EventArgs e)
         {
             Application.Exit();
@@ -187,6 +192,7 @@ namespace SmartTask
         protected override void OnClosing(CancelEventArgs e)
         {
             e.Cancel = true;
+            this.Nud_Interval.Value = Settings.Default.Interval;
             Hide();
         }
 

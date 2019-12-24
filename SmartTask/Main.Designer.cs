@@ -35,10 +35,10 @@
             this.RunStart = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.Quit = new System.Windows.Forms.ToolStripMenuItem();
-            this.interval = new System.Windows.Forms.NumericUpDown();
-            this.btnOK = new System.Windows.Forms.Button();
+            this.Nud_Interval = new System.Windows.Forms.NumericUpDown();
+            this.BtnOK = new System.Windows.Forms.Button();
             this.contextMenuStrip.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.interval)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Nud_Interval)).BeginInit();
             this.SuspendLayout();
             // 
             // taskbarIcon
@@ -78,41 +78,41 @@
             this.Quit.Text = "退出";
             this.Quit.Click += new System.EventHandler(this.Quit_Click);
             // 
-            // interval
+            // Nud_Interval
             // 
-            this.interval.Location = new System.Drawing.Point(87, 99);
-            this.interval.Minimum = new decimal(new int[] {
+            this.Nud_Interval.Location = new System.Drawing.Point(87, 99);
+            this.Nud_Interval.Minimum = new decimal(new int[] {
             1,
             0,
             0,
             0});
-            this.interval.Name = "interval";
-            this.interval.Size = new System.Drawing.Size(120, 21);
-            this.interval.TabIndex = 1;
-            this.interval.Value = new decimal(new int[] {
+            this.Nud_Interval.Name = "Nud_Interval";
+            this.Nud_Interval.Size = new System.Drawing.Size(120, 21);
+            this.Nud_Interval.TabIndex = 1;
+            this.Nud_Interval.Value = new decimal(new int[] {
             3,
             0,
             0,
             0});
             // 
-            // btnOK
+            // BtnOK
             // 
-            this.btnOK.Location = new System.Drawing.Point(110, 136);
-            this.btnOK.Name = "btnOK";
-            this.btnOK.Size = new System.Drawing.Size(75, 23);
-            this.btnOK.TabIndex = 2;
-            this.btnOK.Text = "确定";
-            this.btnOK.UseVisualStyleBackColor = true;
-            this.btnOK.Click += new System.EventHandler(this.btnOK_Click);
+            this.BtnOK.Location = new System.Drawing.Point(110, 136);
+            this.BtnOK.Name = "BtnOK";
+            this.BtnOK.Size = new System.Drawing.Size(75, 23);
+            this.BtnOK.TabIndex = 2;
+            this.BtnOK.Text = "确定";
+            this.BtnOK.UseVisualStyleBackColor = true;
+            this.BtnOK.Click += new System.EventHandler(this.BtnOK_Click);
             // 
             // MainForm
             // 
-            this.AcceptButton = this.btnOK;
+            this.AcceptButton = this.BtnOK;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(313, 251);
-            this.Controls.Add(this.btnOK);
-            this.Controls.Add(this.interval);
+            this.Controls.Add(this.BtnOK);
+            this.Controls.Add(this.Nud_Interval);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
@@ -121,7 +121,7 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "SmartTaskbar";
             this.contextMenuStrip.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.interval)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Nud_Interval)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -133,8 +133,8 @@
         private System.Windows.Forms.ToolStripMenuItem RunStart;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem Quit;
-        private System.Windows.Forms.NumericUpDown interval;
-        private System.Windows.Forms.Button btnOK;
+        private System.Windows.Forms.NumericUpDown Nud_Interval;
+        private System.Windows.Forms.Button BtnOK;
     }
 }
 
