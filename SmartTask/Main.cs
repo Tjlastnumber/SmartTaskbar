@@ -13,6 +13,8 @@ namespace SmartTask
 {
     public partial class MainForm : Form
     {
+
+
         private const int WH_KEYBOARD_LL = 13;
         private const int WH_MOUSE_LL = 14;
 
@@ -27,6 +29,7 @@ namespace SmartTask
         private static HookProc MouseHookProc;
         private static HookProc KeyBoardHookProc;
 
+        private bool timeRunning;
         private bool? preWindowState;
         private bool currentWindowState;
         private int cacheProcessId;
@@ -48,6 +51,7 @@ namespace SmartTask
         {
             InitializeComponent();
             RunStart.Checked = Program.IsRunStart();
+            SmartTaskEnable.Checked = true;
 
             MouseHookProc = new HookProc(MouseHookHandler);
             KeyBoardHookProc = new HookProc(KeyBoardHookHandler);
@@ -82,10 +86,12 @@ namespace SmartTask
             _timer.Elapsed += Time_Elapsed;
             _timer.AutoReset = true;
             _timer.Start();
+            timeRunning = true;
         }
 
         private void ResetTimer()
         {
+            if (!SmartTaskEnable.Checked) return;
             _timer.Close();
             InitTimer();
         }
@@ -163,6 +169,7 @@ namespace SmartTask
         private void BtnOK_Click(object sender, EventArgs e)
         {
             Settings.Default.Interval = this.Nud_Interval.Value;
+            Settings.Default.Save();
             var interval = Convert.ToDouble(this.Nud_Interval.Value) * 1000D;
             _timer.Stop();
             _timer.Interval = interval;
@@ -173,15 +180,6 @@ namespace SmartTask
 
         private void taskbarIcon_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            if (_isShow)
-            {
-                Hide();
-            }
-            else
-            {
-                Show();
-            }
-            _isShow = !_isShow;
         }
 
         private void Quit_Click(object sender, EventArgs e)
@@ -198,6 +196,39 @@ namespace SmartTask
 
         private delegate int HookProc(int nCode, int wParam, IntPtr IParam);
 
+        private void SmartTaskEanbled()
+        {
+            SmartTaskEnable.Checked = !SmartTaskEnable.Checked;
+            if (SmartTaskEnable.Checked)
+            {
+                var interval = Convert.ToDouble(this.Nud_Interval.Value) * 1000D;
+                _timer.Interval = interval;
+                _timer.Start();
+                this.taskbarIcon.Icon = Resources.SmartTaskbarx32;
+            }
+            else
+            {
+                _timer.Stop();
+                this.taskbarIcon.Icon = Resources.SmartTaskbarEnablex32;
+            }
+            SwichTaskBar(false);
+        }
+
+        private void taskbarIcon_MouseDoubleClick_1(object sender, MouseEventArgs e)
+        {
+            SmartTaskEanbled();
+        }
+
+        private void SmartTaskEnable_Click(object sender, EventArgs e)
+        {
+            SmartTaskEanbled();
+        }
+
+        private void Settings_Click(object sender, EventArgs e)
+        {
+            this.SetTopLevel(true);
+            this.Show();
+        }
     }
 
 }

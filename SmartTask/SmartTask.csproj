@@ -97,5 +97,8 @@
   <ItemGroup>
     <None Include="Resources\SmartTaskbar.png" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\SmartTaskbarEnablex32.ico" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
